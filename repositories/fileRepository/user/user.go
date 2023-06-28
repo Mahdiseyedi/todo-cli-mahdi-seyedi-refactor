@@ -1,4 +1,4 @@
-package fileRepository
+package user
 
 import (
 	"bufio"
@@ -43,7 +43,7 @@ func (f FileStore) Load() ([]string, error) {
 	return pData, err
 }
 
-func (f FileStore) Deserializer(pData []string) []models.User {
+func (f FileStore) UserDeserializer(pData []string) []models.User {
 	var users []models.User
 
 	for _, i := range pData {

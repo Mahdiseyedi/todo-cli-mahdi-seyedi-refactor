@@ -1,7 +1,5 @@
-package fileRepository
+package user
 
-// Import the testing and assert packages
-// Import the testing package
 import (
 	"bufio"
 	"encoding/json"
@@ -53,7 +51,7 @@ func TestWriteUserToFile(t *testing.T) {
 	}
 }
 
-func TestJsonDeserializer(t *testing.T) {
+func TestUserJsonDeserializer(t *testing.T) {
 	// Create a user instance with some sample data
 	user := models.User{
 		ID:       1,
@@ -104,7 +102,7 @@ func TestJsonDeserializer(t *testing.T) {
 	}
 }
 
-func TestTextDeserializer(t *testing.T) {
+func TestUserTextDeserializer(t *testing.T) {
 	// Create a user instance with some sample data
 	user := models.User{
 		ID:       10,
@@ -153,7 +151,7 @@ func TestTextDeserializer(t *testing.T) {
 	}
 }
 
-func TestDeserializer(t *testing.T) {
+func TestUserDeserializer(t *testing.T) {
 
 	fs := FileStore{serializationMode: consts.TextSerializationMode}
 	pData := []string{
@@ -164,7 +162,7 @@ func TestDeserializer(t *testing.T) {
 		"id: invalid, name: m@m, email: 5, password: e4da3b7fbbce2345d7772b0674a318d5",
 	}
 
-	users := fs.Deserializer(pData)
+	users := fs.UserDeserializer(pData)
 	if len(users) != 4 {
 		t.Errorf("expected 4 users, got %d", len(users))
 	}
