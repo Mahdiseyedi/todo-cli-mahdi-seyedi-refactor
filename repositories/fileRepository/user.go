@@ -22,8 +22,9 @@ func New(path, serializationMode string) FileStore {
 }
 
 func (f FileStore) Save(u models.User) {
-	//f.writeUserToFile(u)
+	f.writeUserToFile(u)
 }
+
 func (f FileStore) Load() ([]string, error) {
 	var err error
 	var pData []string
@@ -133,9 +134,7 @@ func (f FileStore) writeUserToFile(user models.User) error {
 		return fmt.Errorf("can't write to the file: %w", err)
 	}
 
-	// Print the number of written bytes for debugging purposes
 	fmt.Println("numberOfWrittenBytes", n)
 
-	// Return nil error if everything went well
 	return nil
 }
