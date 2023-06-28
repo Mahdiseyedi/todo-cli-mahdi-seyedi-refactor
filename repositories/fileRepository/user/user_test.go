@@ -15,7 +15,7 @@ import (
 func TestWriteUserToFile(t *testing.T) {
 	// Create a FileStore instance with a test file path and serialization mode
 	f := FileStore{
-		Filepath:          "test.txt",
+		Filepath:          "./test.txt",
 		serializationMode: consts.JsonSerializationMode,
 	}
 
