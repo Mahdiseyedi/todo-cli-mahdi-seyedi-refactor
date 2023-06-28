@@ -77,6 +77,8 @@ func TextDeserializer(taskStr string) (models.Task, error) {
 		return models.Task{}, fmt.Errorf("invalid task string: %s", taskStr)
 	}
 
+	fmt.Println(fields)
+
 	idStr := fields[0][4:]
 	title := fields[1][8:]
 	dueDate := fields[2][10:]
@@ -162,4 +164,61 @@ func (f FileStore) writeTaskToFile(task models.Task) error {
 	fmt.Println("numberOfWrittenBytes", n)
 
 	return nil
+}
+
+func (f FileStore) CreateNewTask(task models.Task) (models.Task, error) {
+
+	refID, err := f.generateID()
+	if err != nil {
+		return models.Task{}, err
+	}
+	task.ID = refID
+
+	err = f.writeTaskToFile(task)
+	if err != nil {
+		return models.Task{}, fmt.Errorf("can't write task to file: %v", err)
+	}
+
+	return task, nil
+}
+
+func (f FileStore) generateID() (int, error) {
+	lines, err := f.Load()
+	if err != nil {
+		return 0, fmt.Errorf("files can't load for counting lines%w", err)
+	}
+
+	if len(lines) == 0 {
+		return 1, err
+	}
+
+	lastLine := lines[len(lines)-1]
+
+	lastTask := f.TaskDeserializer([]string{lastLine})
+
+	return lastTask[0].ID + 1, err
+}
+
+func (f FileStore) ListUserTasks(userID int) ([]models.Task, error) {
+
+	lines, err := f.Load()
+	if err != nil {
+		return nil, fmt.Errorf("can't read from file: %w", err)
+	}
+
+	var tasks []models.Task
+
+	for _, line := range lines {
+		task := f.TaskDeserializer([]string{line})
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		if task[0].UserID == userID {
+			tasks = append(tasks, task[0])
+		}
+	}
+
+	return tasks, nil
 }
