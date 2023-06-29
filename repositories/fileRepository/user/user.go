@@ -70,16 +70,17 @@ func (f FileStore) UserDeserializer(pData []string) []models.User {
 
 func TextDeserializer(userStr string) (models.User, error) {
 
+	userStr = strings.TrimRight(userStr, "\n")
 	fields := strings.Split(userStr, ",")
 
 	if len(fields) != 4 {
 		return models.User{}, fmt.Errorf("invalid user string: %s", userStr)
 	}
 
-	idStr := strings.TrimSpace(strings.Trim(fields[0], "ID: "))
-	name := strings.TrimSpace(strings.Trim(fields[1], "Name:"))
-	email := strings.TrimSpace(strings.Trim(fields[2], "Email:"))
-	password := strings.TrimSpace(strings.Trim(fields[3], "Password:"))
+	idStr := fields[0][4:]
+	name := fields[1][7:]
+	email := fields[2][8:]
+	password := fields[3][11:]
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -88,11 +89,11 @@ func TextDeserializer(userStr string) (models.User, error) {
 
 	user := models.User{
 		ID:       id,
-		Name:     name[6:],
-		Email:    email[7:],
-		Password: password[10:],
+		Name:     name,
+		Email:    email,
+		Password: password,
 	}
-
+	fmt.Println(user)
 	return user, nil
 }
 
@@ -181,15 +182,17 @@ func (f FileStore) generateID() (int, error) {
 
 func (f FileStore) ListUsers() ([]models.User, error) {
 
-	lines, err := f.Load()
-
+	file, err := os.Open(f.Filepath)
 	if err != nil {
-		return nil, fmt.Errorf("can't read from file: %w", err)
+		return nil, fmt.Errorf("can't open file: %w", err)
 	}
+	defer file.Close()
 
 	var users []models.User
 
-	for _, line := range lines {
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
 		user := f.UserDeserializer([]string{line})
 		if err != nil {
 			fmt.Println(err)
@@ -197,6 +200,10 @@ func (f FileStore) ListUsers() ([]models.User, error) {
 		}
 
 		users = append(users, user[0])
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("can't scan file: %w", err)
 	}
 
 	return users, nil

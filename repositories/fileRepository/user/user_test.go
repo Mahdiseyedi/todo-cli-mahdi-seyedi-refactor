@@ -103,10 +103,10 @@ func TestUserJsonDeserializer(t *testing.T) {
 func TestUserTextDeserializer(t *testing.T) {
 	// Create a user instance with some sample data
 	user := models.User{
-		ID:       10,
-		Name:     "h@hmahdi",
-		Email:    "1",
-		Password: "c4ca4238a0b923820dcc509a6f75849b",
+		ID:       1,
+		Name:     "Alice",
+		Email:    "alice@example.com",
+		Password: "123456",
 	}
 
 	// Format the user data as a text string
@@ -133,10 +133,10 @@ func TestUserTextDeserializer(t *testing.T) {
 
 	// Check if the user struct matches the expected data
 	expected := models.User{
-		ID:       10,
-		Name:     "h@hmahdi",
-		Email:    "1",
-		Password: "c4ca4238a0b923820dcc509a6f75849b",
+		ID:       1,
+		Name:     "Alice",
+		Email:    "alice@example.com",
+		Password: "123456",
 	}
 	if !reflect.DeepEqual(user, expected) {
 		t.Errorf("user does not match expected data: got %v, want %v", user, expected)

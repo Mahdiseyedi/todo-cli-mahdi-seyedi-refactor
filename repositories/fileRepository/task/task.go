@@ -105,12 +105,7 @@ func TextDeserializer(taskStr string) (models.Task, error) {
 	if err != nil {
 		return models.Task{}, fmt.Errorf("invalid userID: %s", userIDStr)
 	}
-	fmt.Println(id)
-	fmt.Println(title)
-	fmt.Println(dueDate)
-	fmt.Println(categoryID)
-	fmt.Println(isDone)
-	fmt.Println(userID)
+
 	task := models.Task{
 		ID:         id,
 		Title:      title,
@@ -119,7 +114,7 @@ func TextDeserializer(taskStr string) (models.Task, error) {
 		IsDone:     isDone,
 		UserID:     userID,
 	}
-	fmt.Println(task)
+
 	return task, nil
 }
 
