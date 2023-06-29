@@ -76,10 +76,10 @@ func TextDeserializer(userStr string) (models.User, error) {
 		return models.User{}, fmt.Errorf("invalid user string: %s", userStr)
 	}
 
-	idStr := strings.TrimSpace(strings.Trim(fields[0], "id: "))
-	name := strings.TrimSpace(strings.Trim(fields[1], "name:"))
-	email := strings.TrimSpace(strings.Trim(fields[2], "email:"))
-	password := strings.TrimSpace(strings.Trim(fields[3], "password:"))
+	idStr := strings.TrimSpace(strings.Trim(fields[0], "ID: "))
+	name := strings.TrimSpace(strings.Trim(fields[1], "Name:"))
+	email := strings.TrimSpace(strings.Trim(fields[2], "Email:"))
+	password := strings.TrimSpace(strings.Trim(fields[3], "Password:"))
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -117,7 +117,7 @@ func (f FileStore) writeUserToFile(user models.User) error {
 	var data []byte
 	switch f.serializationMode {
 	case consts.TextSerializationMode:
-		data = []byte(fmt.Sprintf("id: %d, name: %s, email: %s, password: %s\n", user.ID, user.Name,
+		data = []byte(fmt.Sprintf("ID: %d, Name: %s, Email: %s, Password: %s\n", user.ID, user.Name,
 			user.Email, user.Password))
 	case consts.JsonSerializationMode:
 		data, err = json.Marshal(user)
@@ -137,4 +137,67 @@ func (f FileStore) writeUserToFile(user models.User) error {
 	fmt.Println("numberOfWrittenBytes", n)
 
 	return nil
+}
+
+func (f FileStore) CreateNewUser(user models.User) (models.User, error) {
+
+	refID, err := f.generateID()
+	if err != nil {
+		return models.User{}, err
+	}
+	user.ID = refID
+
+	//TODO : implement this section for hash password
+	//	user.Password = hashThePassword(user.Password)
+
+	err = f.writeUserToFile(user)
+	if err != nil {
+		return models.User{}, fmt.Errorf("can't write user to file: %v", err)
+	}
+
+	return user, nil
+}
+
+func (f FileStore) generateID() (int, error) {
+
+	lines, err := f.Load()
+	if err != nil {
+		return 0, fmt.Errorf("files can't load for counting lines: %w", err)
+	}
+
+	if len(lines) == 0 {
+		return 1, nil
+	}
+
+	lastLine := lines[len(lines)-1]
+
+	lastUser := f.UserDeserializer([]string{lastLine})
+	if err != nil {
+		return 0, fmt.Errorf("can't deserialize last line to user: %w", err)
+	}
+
+	return lastUser[0].ID + 1, nil
+}
+
+func (f FileStore) ListUsers() ([]models.User, error) {
+
+	lines, err := f.Load()
+
+	if err != nil {
+		return nil, fmt.Errorf("can't read from file: %w", err)
+	}
+
+	var users []models.User
+
+	for _, line := range lines {
+		user := f.UserDeserializer([]string{line})
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		users = append(users, user[0])
+	}
+
+	return users, nil
 }

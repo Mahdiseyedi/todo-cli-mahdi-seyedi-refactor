@@ -52,7 +52,6 @@ func TestWriteTaskToFile(t *testing.T) {
 		t.Errorf("can't delete test file: %v", err)
 	}
 }
-
 func TestTaskJsonDeserializer(t *testing.T) {
 	// Create a task instance with some sample data
 	task := models.Task{

@@ -2,12 +2,18 @@ package main
 
 import (
 	"fmt"
-	"todo-cli-refactor/repositories/fileRepository/category"
+	"todo-cli-refactor/consts"
+	"todo-cli-refactor/repositories/fileRepository/user"
 )
 
 func main() {
 
-	//id: 1, title: Work, color: Red, userID: 10
-	res, err := category.TextDeserializer("id: 1, title: Work, color: Red, userID: 10")
-	fmt.Println(res, err)
+	f := user.New("./user.txt", consts.TextSerializationMode)
+	data := []string{"ID: 1,  Name: hooooo,  Email: eeeee@eeee,  Password: 423234",
+		"ID: 6,  Name: hosdf,  Email: h@asdgsd,  Password: 2"}
+	k := f.UserDeserializer(data)
+	fmt.Println("--------------------")
+	for _, t := range k {
+		fmt.Println(t)
+	}
 }
