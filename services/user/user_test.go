@@ -130,3 +130,38 @@ func TestLogin(t *testing.T) {
 		}
 	})
 }
+
+func TestListUsers(t *testing.T) {
+	// Create a mockRepository instance with some initial data
+	mr := mockRepository{
+		data: map[int]models.User{
+			1: {ID: 1, Name: "Alice", Email: "alice@example.com", Password: "123456"},
+			2: {ID: 2, Name: "Bob", Email: "bob@example.com", Password: "654321"},
+			3: {ID: 3, Name: "Charlie", Email: "charlie@example.com", Password: "abcdef"},
+			4: {ID: 4, Name: "David", Email: "david@example.com", Password: "123456"},
+		},
+	}
+
+	// Create a Service instance with the mockRepository
+	s := NewService(mr)
+
+	// Create a ListUsersRequest instance
+	req := ListUsersRequest{}
+
+	// Call the ListUsers method and check for errors
+	res, err := s.ListUsers(req)
+	if err != nil {
+		t.Errorf("ListUsers failed : %v", err)
+	}
+
+	// Check if the response contains the expected data
+	expected := []models.User{
+		{ID: 1, Name: "Alice", Email: "alice@example.com", Password: "123456"},
+		{ID: 2, Name: "Bob", Email: "bob@example.com", Password: "654321"},
+		{ID: 3, Name: "Charlie", Email: "charlie@example.com", Password: "abcdef"},
+		{ID: 4, Name: "David", Email: "david@example.com", Password: "123456"},
+	}
+	if !reflect.DeepEqual(res.Users, expected) {
+		t.Errorf("response does not match expected data : got %v , want %v ", res.Users, expected)
+	}
+}
