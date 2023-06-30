@@ -7,37 +7,30 @@ import (
 )
 
 type mockRepository struct {
-	data map[int]models.Task // map of task ID to task struct
+	data map[int]models.Task
 }
 
 func (m mockRepository) CreateNewTask(task models.Task) (models.Task, error) {
-	// Generate a unique ID for the task by incrementing the length of the map
 	task.ID = len(m.data) + 1
 
-	// Add the task to the map with the ID as the key
 	m.data[task.ID] = task
 
-	// Return the created task
 	return task, nil
 }
 
 func (m mockRepository) ListUserTasks(userID int) ([]models.Task, error) {
-	// Create an empty slice of tasks
 	var tasks []models.Task
 
-	// Loop over the map and append the tasks that match the user ID to the slice
 	for _, task := range m.data {
 		if task.UserID == userID {
 			tasks = append(tasks, task)
 		}
 	}
 
-	// Return the slice of tasks
 	return tasks, nil
 }
 
 func TestCreate(t *testing.T) {
-	// Create a mockRepository instance with some initial data
 	mr := mockRepository{
 		data: map[int]models.Task{
 			1: {ID: 1, Title: "Buy groceries", DueDate: "2021-12-31", CategoryID: 2, IsDone: false, UserID: 3},
@@ -46,10 +39,8 @@ func TestCreate(t *testing.T) {
 		},
 	}
 
-	// Create a Service instance with the mockRepository
 	s := NewService(mr)
 
-	// Create a CreateRequest instance with some sample data
 	req := CreateRequest{
 		Title:               "Watch a movie",
 		DueDate:             "2022-01-03",
@@ -57,13 +48,11 @@ func TestCreate(t *testing.T) {
 		AuthenticatedUserID: 6,
 	}
 
-	// Call the Create method and check for errors
 	res, err := s.Create(req)
 	if err != nil {
 		t.Errorf("Create failed: %v", err)
 	}
 
-	// Check if the response contains the expected data
 	expected := models.Task{
 		ID:         4,
 		Title:      "Watch a movie",
@@ -78,7 +67,6 @@ func TestCreate(t *testing.T) {
 }
 
 func TestListUserTasks(t *testing.T) {
-	// Create a mockRepository instance with some initial data
 	mr := mockRepository{
 		data: map[int]models.Task{
 			1: {ID: 1, Title: "Buy groceries", DueDate: "2021-12-31", CategoryID: 2, IsDone: false, UserID: 3},
@@ -88,21 +76,17 @@ func TestListUserTasks(t *testing.T) {
 		},
 	}
 
-	// Create a Service instance with the mockRepository
 	s := NewService(mr)
 
-	// Create a ListRequest instance with a sample user ID
 	req := ListRequest{
 		UserID: 3,
 	}
 
-	// Call the List method and check for errors
 	res, err := s.List(req)
 	if err != nil {
 		t.Errorf("List failed: %v", err)
 	}
 
-	// Check if the response contains the expected data
 	expected := []models.Task{
 		{ID: 1, Title: "Buy groceries", DueDate: "2021-12-31", CategoryID: 2, IsDone: false, UserID: 3},
 	}

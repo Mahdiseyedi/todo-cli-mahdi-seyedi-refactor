@@ -13,13 +13,11 @@ import (
 )
 
 func TestWriteTaskToFile(t *testing.T) {
-	// Create a FileStore instance with a test file path and serialization mode
 	f := FileStore{
 		Filepath:          "test.txt",
 		serializationMode: consts.JsonSerializationMode,
 	}
 
-	// Create a task instance with some sample data
 	task := models.Task{
 		ID:         1,
 		Title:      "Buy groceries",
@@ -29,14 +27,11 @@ func TestWriteTaskToFile(t *testing.T) {
 		UserID:     3,
 	}
 
-	// Call the writeTaskToFile method and check for errors
 	err := f.writeTaskToFile(task)
 	if err != nil {
-		// Use the t.Errorf method to report an error
 		t.Errorf("writeTaskToFile failed: %v", err)
 	}
 
-	// Read the test file and check if it contains the expected data
 	data, err := ioutil.ReadFile(f.Filepath)
 	if err != nil {
 		t.Errorf("can't read test file: %v", err)
@@ -46,14 +41,12 @@ func TestWriteTaskToFile(t *testing.T) {
 		t.Errorf("test file does not match expected data: got %s, want %s", data, expected)
 	}
 
-	// Delete the test file after the test is done
 	err = os.Remove(f.Filepath)
 	if err != nil {
 		t.Errorf("can't delete test file: %v", err)
 	}
 }
 func TestTaskJsonDeserializer(t *testing.T) {
-	// Create a task instance with some sample data
 	task := models.Task{
 		ID:         1,
 		Title:      "Buy groceries",
@@ -63,31 +56,26 @@ func TestTaskJsonDeserializer(t *testing.T) {
 		UserID:     3,
 	}
 
-	// Marshal the task data to JSON and check for errors
 	data, err := json.Marshal(task)
 	if err != nil {
 		t.Errorf("can't marshal task struct to json: %v", err)
 	}
 
-	// Write the JSON data to a test file and check for errors
 	err = ioutil.WriteFile("test.txt", data, 0644)
 	if err != nil {
 		t.Errorf("can't write to test file: %v", err)
 	}
 
-	// Read the test file and check for errors
 	data, err = ioutil.ReadFile("test.txt")
 	if err != nil {
 		t.Errorf("can't read test file: %v", err)
 	}
 
-	// Call the JsonDeserializer function and check for errors
 	task, err = JsonDeserializer(string(data))
 	if err != nil {
 		t.Errorf("JsonDeserializer failed: %v", err)
 	}
 
-	// Check if the task struct matches the expected data
 	expected := models.Task{
 		ID:         1,
 		Title:      "Buy groceries",
@@ -100,14 +88,12 @@ func TestTaskJsonDeserializer(t *testing.T) {
 		t.Errorf("task does not match expected data: got %v, want %v", task, expected)
 	}
 
-	// Delete the test file after the test is done
 	err = os.Remove("test.txt")
 	if err != nil {
 		t.Errorf("can't delete test file: %v", err)
 	}
 }
 func TestTaskTextDeserializer(t *testing.T) {
-	// Create a task instance with some sample data
 	task := models.Task{
 		ID:         1,
 		Title:      "Buy groceries",
@@ -117,29 +103,24 @@ func TestTaskTextDeserializer(t *testing.T) {
 		UserID:     3,
 	}
 
-	// Format the task data as a text string
 	data := fmt.Sprintf("id: %d, title: %s, dueDate: %s, categoryID: %d, isDone: %t, userID: %d\n", task.ID, task.Title,
 		task.DueDate, task.CategoryID, task.IsDone, task.UserID)
 
-	// Write the text data to a test file and check for errors
 	err := ioutil.WriteFile("test.txt", []byte(data), 0644)
 	if err != nil {
 		t.Errorf("can't write to test file: %v", err)
 	}
 
-	// Read the test file and check for errors
 	data2, err1 := ioutil.ReadFile("test.txt")
 	if err1 != nil {
 		t.Errorf("can't read test file: %v", err1)
 	}
 
-	// Call the TextDeserializer function and check for errors
 	task, err = TextDeserializer(string(data2))
 	if err != nil {
 		t.Errorf("TextDeserializer failed: %v", err)
 	}
 
-	// Check if the task struct matches the expected data
 	expected := models.Task{
 		ID:         1,
 		Title:      "Buy groceries",
@@ -152,7 +133,6 @@ func TestTaskTextDeserializer(t *testing.T) {
 		t.Errorf("task does not match expected data: got %v, want %v", task, expected)
 	}
 
-	// Delete the test file after the test is done
 	err = os.Remove("test.txt")
 	if err != nil {
 		t.Errorf("can't delete test file: %v", err)
@@ -220,7 +200,6 @@ func TestSave(t *testing.T) {
 	}
 }
 func TestCreateNewTask(t *testing.T) {
-	// Create a temporary file and a FileStore instance with the file path and serialization mode
 	tmpfile, err := ioutil.TempFile("", "test")
 	if err != nil {
 		t.Fatal(err)
@@ -229,7 +208,6 @@ func TestCreateNewTask(t *testing.T) {
 
 	fs := FileStore{Filepath: tmpfile.Name(), serializationMode: consts.TextSerializationMode}
 
-	// Create a task instance with some sample data
 	task := models.Task{
 		Title:      "Buy groceries",
 		DueDate:    "2021-12-31",
@@ -238,25 +216,21 @@ func TestCreateNewTask(t *testing.T) {
 		UserID:     3,
 	}
 
-	// Call the CreateNewTask method and check for errors
 	createdTask, err := fs.CreateNewTask(task)
 	if err != nil {
 		t.Errorf("CreateNewTask failed: %v", err)
 	}
 
-	// Check if the created task has a valid ID
 	if createdTask.ID == 0 {
 		t.Errorf("expected a non-zero ID, got %d", createdTask.ID)
 	}
 
-	// Check if the created task matches the input data except for the ID
 	expectedTask := task
 	expectedTask.ID = createdTask.ID
 	if !reflect.DeepEqual(createdTask, expectedTask) {
 		t.Errorf("created task does not match expected data: got %v, want %v", createdTask, expectedTask)
 	}
 
-	// Read the temporary file and check if it contains the expected data
 	data, err := ioutil.ReadFile(tmpfile.Name())
 	if err != nil {
 		t.Errorf("can't read temporary file: %v", err)
@@ -267,7 +241,6 @@ func TestCreateNewTask(t *testing.T) {
 	}
 }
 func TestGenerateID(t *testing.T) {
-	// Create a temporary file and a FileStore instance with the file path and serialization mode
 	tmpfile, err := ioutil.TempFile("", "test")
 	if err != nil {
 		t.Fatal(err)
@@ -276,7 +249,6 @@ func TestGenerateID(t *testing.T) {
 
 	fs := FileStore{Filepath: tmpfile.Name(), serializationMode: consts.TextSerializationMode}
 
-	// Write some sample data to the file using the writeTaskToFile method
 	tasks := []models.Task{
 		{ID: 1, Title: "Buy groceries", DueDate: "2021-12-31", CategoryID: 2, IsDone: false, UserID: 3},
 		{ID: 2, Title: "Clean the house", DueDate: "2022-01-01", CategoryID: 1, IsDone: true, UserID: 4},
@@ -289,20 +261,17 @@ func TestGenerateID(t *testing.T) {
 		}
 	}
 
-	// Call the generateID method and check for errors
 	id, err := fs.generateID()
 	if err != nil {
 		t.Errorf("generateID failed: %v", err)
 	}
 
-	// Check if the generated ID is one more than the last task ID
 	expectedID := tasks[len(tasks)-1].ID + 1
 	if id != expectedID {
 		t.Errorf("expected ID %d, got %d", expectedID, id)
 	}
 }
 func TestListUserTasks(t *testing.T) {
-	// Create a temporary file and a FileStore instance with the file path and serialization mode
 	tmpfile, err := ioutil.TempFile("", "test")
 	if err != nil {
 		t.Fatal(err)
@@ -311,7 +280,6 @@ func TestListUserTasks(t *testing.T) {
 
 	fs := FileStore{Filepath: tmpfile.Name(), serializationMode: consts.TextSerializationMode}
 
-	// Write some sample data to the file using the writeTaskToFile method
 	tasks := []models.Task{
 		{ID: 1, Title: "Buy groceries", DueDate: "2021-12-31", CategoryID: 2, IsDone: false, UserID: 3},
 		{ID: 2, Title: "Clean the house", DueDate: "2022-01-01", CategoryID: 1, IsDone: true, UserID: 4},
@@ -324,14 +292,12 @@ func TestListUserTasks(t *testing.T) {
 		}
 	}
 
-	// Call the ListUserTasks method with a sample user ID and check for errors
 	userID := 3
 	result, err := fs.ListUserTasks(userID)
 	if err != nil {
 		t.Errorf("ListUserTasks failed: %v", err)
 	}
 
-	// Check if the result contains the expected data
 	expected := []models.Task{
 		{ID: 1, Title: "Buy groceries", DueDate: "2021-12-31", CategoryID: 2, IsDone: false, UserID: 3},
 	}

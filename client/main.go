@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"todo-cli-refactor/delivery/deliveryParam"
 )
 
 func main() {
@@ -31,10 +32,10 @@ func main() {
 
 	fmt.Println("local address", connection.LocalAddr())
 
-	req := deliveryparam.Request{Command: message}
+	req := deliveryParam.Request{Command: message}
 	if req.Command == "create-task" {
-		req.CreateTaskRequest == deliveryparam.CreateRequest{
-			Tittle:     "test",
+		req.CreateTaskRequest = deliveryParam.CreateTaskRequest{
+			Title:      "test",
 			DueDate:    "test",
 			CategoryID: 1,
 		}
